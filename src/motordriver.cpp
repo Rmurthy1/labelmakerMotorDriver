@@ -29,60 +29,19 @@ const int buttonPin = D7;  // the number of the pushbutton pin
 int buttonState = 0;  // variable for reading the pushbutton status
 
 // initialize the stepper library
-//AccelStepper stepper(AccelStepper::HALF4WIRE, IN1, IN3, IN2, IN4);
 AccelStepperWithDistance stepper(AccelStepper::HALF4WIRE, IN1, IN3, IN2, IN4);
 
+// function defitions
+void lcdInit();
+void stepperInit();
+
 void setup() {
-   Serial.begin(9600);
+  Serial.begin(9600);
 
-     pinMode(buttonPin, INPUT);
+  pinMode(buttonPin, INPUT);
   
-  stepper.setMaxSpeed(1000);
-  stepper.setAcceleration(500);
-  stepper.setStepsPerRotation(200);   // 1.8° stepper motor
-  stepper.setMicroStep(16);           // 1/16 microstepping
-  stepper.setDistancePerRotation(8);  // 8mm per rotation
-  stepper.setAnglePerRotation(360);   // Standard 360° per rotation
-  
-
-  /*
-  // Move to 50mm
-  stepper.runToNewDistance(50);
-  Serial.print("Current position: ");
-  Serial.println(stepper.getCurrentPositionDistance());
-  
-  // Move relatively by -20mm
-  stepper.runRelative(-20);
-  Serial.print("New position after relative move: ");
-  Serial.println(stepper.getCurrentPositionDistance());
-  
-  // Move to 90° angle
-  stepper.runToNewAngle(90);
-  Serial.print("Position after moving to 90°: ");
-  Serial.println(stepper.getCurrentPositionDistance());
-  
-  // Set up a move to 100mm (but don't execute it yet)
-  stepper.moveToDistance(100);
-  */
-  /*stepper.runToNewDistance(100);
-  Serial.println("move 1");
-  stepper.runToNewDistance(200);
-  Serial.println("move 2");
-  */
-
- while (lcd.begin(COLUMS, ROWS, LCD_5x8DOTS, 4, 5, 400000, 250) != 1) //colums, rows, characters size, SDA, SCL, I2C speed in Hz, I2C stretch time in usec 
-  {
-    Serial.println(F("PCF8574 is not connected or lcd pins declaration is wrong. Only pins numbers: 4,5,6,16,11,12,13,14 are legal."));
-    delay(5000);
-  }
-
-    lcd.print(F("PCF8574 is OK...")); //(F()) saves string to flash & keeps dynamic memory free
-
-  lcd.clear();
-
-  lcd.setCursor(0, 0);
-  lcd.print("set distance:");
-  lcd.setCursor(0, 1);
+  lcdInit();
+  stepperInit();
 }
 
 int distance = 0;
@@ -98,7 +57,7 @@ void loop() {
   // turn the ledPin on
   Serial.println(sensorValue);
 
-  distance = map(sensorValue, 1, 1024, 0, 200);
+  distance = map(sensorValue, 1, 1024, 0, 100);
 
   Serial.println(distance);
 
@@ -134,4 +93,28 @@ void loop() {
     }*/
   }
   delay(100);
+}
+
+void stepperInit() {
+  stepper.setMaxSpeed(1000);
+  stepper.setAcceleration(500);
+  stepper.setStepsPerRotation(200);   // 1.8° stepper motor
+  stepper.setMicroStep(16);           // 1/16 microstepping
+  stepper.setDistancePerRotation(8);  // 8mm per rotation
+  stepper.setAnglePerRotation(360);   // Standard 360° per rotation
+}
+
+
+void lcdInit() {
+  while (lcd.begin(COLUMS, ROWS, LCD_5x8DOTS, 4, 5, 400000, 250) != 1) //colums, rows, characters size, SDA, SCL, I2C speed in Hz, I2C stretch time in usec 
+  {
+    Serial.println(F("PCF8574 is not connected or lcd pins declaration is wrong. Only pins numbers: 4,5,6,16,11,12,13,14 are legal."));
+    delay(5000);
+  }
+  lcd.print(F("PCF8574 is OK...")); //(F()) saves string to flash & keeps dynamic memory free
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("set distance:");
+  lcd.setCursor(0, 1);
 }
